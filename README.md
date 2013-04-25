@@ -9,28 +9,34 @@ This is a simple script to accurately count the number of hours studied per day.
 
 For instance, a file containing:
 
-	#; 2013-04-23;
-	5:05-35pm
-	5:40-55
-	6:55-7:25
-	studied this
-	#; 2013-04-24; ??? hours
-	11:00-15am
-	11:55-12:55pm
-	studied that
-	3:10-40
-	3:50-4:20
-	4:30-5:30
-	studied something enlightening
+	#; 2012-12-31; ??? hours
+	11:00-12:00pm
+	#; 2013-01-01; ??? hours
+	2:45-3:45pm
+	10:00-11:00
+	#; 2013-02-01; ??? hours
+	9:00-30pm
+	9:35-10:05
+	10:10-40
+	10:50-11:20
+	#; 2013-02-02; ??? hours
+	4:15-45pm
+	4:50-5:20
 
 would output 
 
-	#; 2013-04-23; 1.25 hours
-	#; 2013-04-24; 3.25 hours
+	#; 2012-12-31; 1.0 hours
+	#; 2013-01-01; 2.0 hours
+	#; 2013-02-01; 2.0 hours
+	#; 2013-02-02; 1.0 hours
+
+	#; 2012-12: 1.0
+	#; 2013-01: 2.0
+	#; 2013-02: 3.0
 
 One shortcut you can use is HH:MM-MM. You don't need to write the whole time.
 
-There is one gotcha to be aware of: "11:00-12am" returns 0.2 hours instead of 1.0 hours. Please use "11:00-12:00am".
+There is one gotcha to be aware of: "5:00-6pm" returns 0.2 hours instead of 1.0 hours. Please use "5:00-6:00am".
 
 ## Installing
 

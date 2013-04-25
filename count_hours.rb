@@ -8,7 +8,6 @@
 # Bugs/Todo
 - "11:00-12am" returns 0.2 hours instead of 1.0 hours
 - add features like "11-12pm" => 1.0 hours
-
 =end
 
 class CountHours
@@ -61,12 +60,44 @@ class CountHours
 
     return mins / 60.0
   end
+
+  def sum_month(month_lines)
+    regex = /\d*\.\d*/
+    return month_lines.inject(0) do |sum, line|
+      sum += line.match(regex)[0].to_f
+    end
+  end
+
+  def display_month(month, month_total)
+    return "#{month}: #{month_total}\n"
+  end
+
+  def per_month
+    total = self.count
+    # captures YYYY-MM
+    regex = /^#; (\d{4}-\d{2})/
+
+    months = Hash.new([])
+    (0...total.size).each do |i|
+      day = total[i]
+      month = day.match(regex)[0]
+      if months.has_key?(month)
+        months[month] = months[month] << day
+      else
+        months[month] = [] << day
+      end
+    end
+
+    return months.collect do |month, month_lines|
+      display_month(month, sum_month(month_lines))
+    end
+  end
 end
 
 
-unless ARGV[0]
-  puts CountHours.new.count
-else
-  puts CountHours.new(file=ARGV[0]).count
-end
+counting = ARGV[0] ? CountHours.new(file=ARGV[0]) : CountHours.new
+
+puts counting.count
+puts
+puts counting.per_month
 
