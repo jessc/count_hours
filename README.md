@@ -36,7 +36,7 @@ would output
 
 One shortcut you can use is HH:MM-MM. You don't need to write the whole time.
 
-There is one gotcha to be aware of: "5:00-6pm" returns 0.2 hours instead of 1.0 hours. Please use "5:00-6:00am".
+There is one gotcha to be aware of: "5:00-6pm" returns 0.2 hours instead of 1.0 hours. Please use "5:00-6:00pm".
 
 ## Installing
 
