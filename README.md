@@ -38,6 +38,18 @@ One shortcut you can use is HH:MM-MM. You don't need to write the whole time.
 
 There is one gotcha to be aware of: "5:00-6pm" returns 0.2 hours instead of 1.0 hours. Please use "5:00-6:00pm".
 
+## Edge Cases
+
+# "9:35-10:05" => ["9:35", "10:05"]
+# "9-10:30pm"  => ["9", "10:30pm"]
+# "9-10"       => ["9", "10"]
+# "9-10am"     => ["9", "10am"]
+# "9:00-10"    => ["9:00", "10"]
+# "9:00-10am"  => ["9:00", "10am"]
+# "9:30-10"    => ["9:30", "10"]
+# "10-1pm"     => ["10", "1pm"]
+# "10-1"       => ["10", "1"]
+
 ## Installing
 
 	$ git clone https://github.com/jessc/count_hours.git
@@ -49,6 +61,6 @@ Edit study_hours.txt and add the day's times, or pass in a filename that has the
 	$ ruby "count_hours.rb" "study_hours.txt"
 
 ## Contributing
- - fix the "11:00-12am" gotcha
+ - fix the "11:00-12pm" gotcha
  - add features like "11-12pm" => 1.0 hours
  - fix bugs at top of count_hours.rb
