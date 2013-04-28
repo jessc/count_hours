@@ -5,7 +5,7 @@ Automatically count up hours of study per day.
 
 ## Overview
 
-This is a simple script to accurately count the number of hours studied per day.
+This script counts the number of hours studied per day.
 
 For instance, a file containing:
 

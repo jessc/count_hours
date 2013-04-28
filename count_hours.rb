@@ -1,6 +1,5 @@
 #!/usr/bin/env ruby
 
-# 2013-04
 # Count hours for each day.
 # 2013-04
 # Jesse Cummins
@@ -18,6 +17,61 @@
 =end
 
 require 'time'
+
+class TimePassed
+  # This class is unfinished.
+  # It's designed to be more idiomatic Ruby and figure out the 
+  # time that passed between something like "9:30-10am".
+  # There are tons of edge cases, so really it just bloats the code.
+  # Could be useful if finished, though.
+  # You have to make certain assumptions.
+  # As long as you're up front with those assumptions
+  # and document them, it will be ok.
+  # edge cases: # all of them?
+  # "9-10"         => ["9", "10"]
+  # "9-10am"       => ["9", "10am"]
+  # "10-1pm"       => ["10", "1pm"]
+  # "10-1"         => ["10", "1"]
+  # "9:00-30"      => ["9:00", "30"]
+  # "9:00-10"      => ["9:00", "10"]
+  # "9:00-10am"    => ["9:00", "10am"]
+  # "9:30-10"      => ["9:30", "10"]
+  # "9-10:30pm"    => ["9", "10:30pm"]
+  # "10:30-1:30pm" => ["10:30", "1:30pm"]
+  # "9:35-10:05"  => ["9:35", "10:05"]
+
+  def initialize(time_string)
+    @time_string = time_string
+  end
+
+  def time_diff(time_string)
+    start, finish = time_string.split("-")
+    start_h_m = start.split(":")
+    fin_h_m = finish.split(":")
+
+    if fin_h_m[-1].match(/am|pm|AM|PM/)
+      am_or_pm = true
+      fin_h_m[-1] = fin_h_m[-1][0...-2]
+    end
+
+    if (start_h_m.length == 1 && fin_h_m.length == 1)
+      start += ":00"
+      finish += ":00"
+    elsif (start_h_m.length == 1 && fin_h_m.length == 2)
+      start += ":00"
+    elsif (start_h_m.length == 2 && fin_h_m.length == 1)
+      if start_h_m[1] > fin_h_m.first
+        finish += ":00"
+      else
+        finish = start[0] + ":" + fin_h_m.first
+      end
+    end
+    # now first and second are definitely time objects
+    # handle am-pm esque changes (11-1pm)
+
+    (Time.parse(second) - Time.parse(first)) / 60 / 60
+  end
+end
 
 class CountHours
   def initialize(file="study_hours.txt")
@@ -45,65 +99,6 @@ class CountHours
     times.split(":").map { |n| n.to_i }
   end
 
-  def time_diff2(time_string)
-    start, finish = time_string.split("-")
-    # p start, finish
-    start_h_m = start.split(":")
-    fin_h_m = finish.split(":")
-
-    if fin_h_m[-1].match(/am|pm|AM|PM/)
-      am_or_pm = true
-      fin_h_m = fin_h_m[0...-2]
-    end
-
-    mins = 0
-    if (start_h_m.length == 1 && fin_h_m == 1)
-      start += ":00"
-      finish += ":00"
-    end
-    # yeah, this is difficult to do:
-    # if (start_h_m > fin_h_m)
-    #   fin_h_m += 12 #hours
-    # end
-  end
-# 10:15 > 1
-
-# edge cases:
-# "9-10"         => ["9", "10"]
-# "9-10am"       => ["9", "10am"]
-# "10-1pm"       => ["10", "1pm"]
-# "10-1"         => ["10", "1"]
-# "10:30-1:30pm" => ["10:30", "1:30pm"]
-# "9:00-10"      => ["9:00", "10"]
-# "9:00-10am"    => ["9:00", "10am"]
-# "9:30-10"      => ["9:30", "10"]
-# "9-10:30pm"    => ["9", "10:30pm"]
-## "9:35-10:05"  => ["9:35", "10:05"]
-
-
-  def time_diff(time_string)
-    start, finish = time_string.split("-")
-    start_h_m = start.split(":")
-    fin_h_m = finish.split(":")
-
-    if (start_h_m.length == 1 && fin_h_m.length == 1)
-      start += ":00"
-      finish += ":00"
-    elsif (start_h_m.length == 1 && fin_h_m.length == 2)
-      start += ":00"
-    elsif (start_h_m.length == 2 && fin_h_m.length == 1)
-      if start_h_m[1] > fin_h_m.first
-        finish += ":00"
-      else
-        finish = start[0] + ":" + fin_h_m.first
-      end
-    end
-    # now first and second are definitely time objects
-    # handle am-pm esque changes (11-1pm)
-
-    (Time.parse(second) - Time.parse(first)) / 60 / 60
-  end
-
   def count_date(text)
     # removes blanks, comments, and lines ending with hour
     text = text.split("\n").reject do |line|
@@ -111,8 +106,23 @@ class CountHours
     end
 
     mins = 0
-    text.each { |line| mins += time_diff(line) }
-    mins
+    text.each do |line|
+      times = line.split("-")
+
+      a = split_times(times[0])
+      b = split_times(times[1])
+
+      # if it's am to pm, add 12 hours to pm
+      b[0] += 12 if a[0] > b[0]
+
+      mins += (b[0] - a[0]) * 60 if ((a[0] < b[0]) && (b[1] != nil))
+
+      if b[1] == nil then mins += b[0] - a[1]
+      else mins += b[1] - a[1]
+      end
+    end
+
+    mins / 60.0
   end
 
   def sum_month(month_lines)
@@ -145,24 +155,9 @@ class CountHours
   end
 end
 
-=begin  
 counting = ARGV[0] ? CountHours.new(file=ARGV[0]) : CountHours.new
 
 puts counting.count
 puts
 puts counting.per_month
-=end
-
-
-counting = CountHours.new
-time_diff = counting.method("time_diff2")
-# p time_diff.("9:35-10:05")
-# p time_diff.("9-10:30pm") # error: 13.5 instead of 1.50
-# p time_diff.("9-10")
-# p time_diff.("9-10am") # first remove am so: 9-10
-# p time_diff.("9:00-10") # did as 9:00-9:10
-# p time_diff.("9:00-10am") # could detect this
-# p time_diff.("9:30-10") # worked
-# p time_diff.("10-1pm")
-# p time_diff.("10-1")
 
