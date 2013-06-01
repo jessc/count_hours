@@ -134,7 +134,7 @@ class CountHours
   end
 
   def display_month(month, month_total)
-    return "#{month}: #{month_total}\n"
+    "#{month}: #{month_total} hours\n"
   end
 
   def per_month
